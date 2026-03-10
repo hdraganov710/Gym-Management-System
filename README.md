@@ -18,4 +18,3 @@ A Java-based application designed to streamline gym operations, member tracking,
 * Git (Version Control)
 
 ## License
-This project is open-source and available under the [MIT License](LICENSE).
