@@ -36,8 +36,8 @@ public class UserService {
                 break;
             case ROLE.CLIENT:
                 newUser = new Client(UUID.randomUUID(), request.email, request.password,
-                        ROLE.CLIENT, request.firstName, request.lastName, request.age, request.weight,
-                        request.weight, request.gender);
+                        ROLE.CLIENT, request.firstName, request.lastName, request.phoneNumber, request.weight,
+                        request.age, request.gender);
 
                 break;
             default:

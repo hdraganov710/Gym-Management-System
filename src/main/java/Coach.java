@@ -19,4 +19,6 @@ public class Coach extends User {
     public String toString(){
         return "This coach has "+this.experience+" experience and his specialty is "+this.specialty;
     }
+
+
 }
