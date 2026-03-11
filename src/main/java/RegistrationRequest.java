@@ -15,6 +15,8 @@ public class RegistrationRequest {
     public GENDER gender;
     public int adminLevel;
     public UUID employeeId;
+    public String assignedCoach;
+
     public RegistrationRequest() {}
 
 }
