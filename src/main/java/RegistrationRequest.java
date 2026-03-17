@@ -16,6 +16,7 @@ public class RegistrationRequest {
     public int adminLevel;
     public UUID employeeId;
     public String assignedCoach;
+    public WorkoutWeek wWeek;
 
     public RegistrationRequest() {}
 

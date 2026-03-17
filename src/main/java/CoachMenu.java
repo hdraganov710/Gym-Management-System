@@ -51,6 +51,35 @@ public class CoachMenu {
         }
     }
     public void createWorkout(){
+        UUID currCoach = coach.getUserId();
+        System.out.println("---Type in the clients ID to assign a workout day---");
+       String idInput = sc.next();
+       UUID clientId = UUID.fromString(idInput);
+       userRepository.findById(clientId).ifPresentOrElse(c -> {
+           if(c instanceof Client client){
+               handleWorkoutCreation(client);
+           }else {
+               System.out.println("Invalid workout ID");
+           }
+       }, () -> System.out.println("User not found."));
 
+    }
+    public void handleWorkoutCreation(Client client){
+        System.out.println("---Workout creation started---");
+        System.out.println("Please enter the name of the day you would like to create a workout for: ");
+        String dayName = sc.next();
+        WorkoutDay targetDay = client.getwP().getDays().stream()
+                .filter(day -> day.getDayName().equalsIgnoreCase(dayName))
+                .findFirst()
+                .orElse(null);
+        if(targetDay == null){
+            System.out.println("Enter an exercise to add: ");
+            sc.nextLine();
+            targetDay.addExercise(sc.nextLine());
+            System.out.println("Exercise added successfully to" + dayName);
+        }
+        else {
+            System.out.println("The day does not exist in the workout plan!");
+        }
     }
 }
