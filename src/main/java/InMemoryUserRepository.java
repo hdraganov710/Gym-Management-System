@@ -9,9 +9,7 @@ public class InMemoryUserRepository implements UserRepository {
         return Optional.ofNullable(database.get(email));
     }
     @Override
-    public void save(User user) {
-        database.put(user.getUserId(),user);
-    }
+    public void save(User user) {database.put(user.getUserId(),user);}
     @Override
     public Optional<User> findByPhoneNumber(String phoneNumber) {return Optional.ofNullable(database.get(phoneNumber));}
     @Override
