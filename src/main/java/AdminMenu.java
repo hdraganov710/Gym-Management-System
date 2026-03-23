@@ -79,39 +79,108 @@ public class AdminMenu {
         userService.register(request);
         System.out.println("User added successfully!");
         }
-        public void changeStatus() {
+    public void changeStatus() {
         System.out.println("--- Change Status ---");
         System.out.println("1. Coach | 2. Client | 3. Admin");
         int choice = sc.nextInt();
+        sc.nextLine();
+
         switch(choice) {
             case 1 -> {
                 System.out.println("Type in the Coach's UserId:");
                 String userId = sc.next();
                 userRepository.findById(UUID.fromString(userId)).ifPresentOrElse(user -> {
                     if(user instanceof Coach coach){
-                        System.out.println("Updating coach: "+coach.getFirstName());
-                        System.out.println("Choose what you want to update(1-XP, 2-Specialty: ");
-                        if(sc.nextInt() == 1) {
-                            coach.setExperience(sc.nextInt());
-                            userRepository.save(coach);
-                            System.out.println("Coach updated!");
-                        }
-                        else if(sc.nextInt() == 2) {
-                            coach.setSpecialty(sc.next());
-                            userRepository.save(coach);
-                            System.out.println("Coach updated!");
-                        }
-                        else {
-                            System.out.println("Invalid choice!");
-                        }
-                    }
-                    else {
-                        System.out.println("That Id does not belong to a coach!");
-                    }
-                },() -> System.out.println("User Not Found!"));
+                        System.out.println("Updating coach: " + coach.getFirstName());
+                        System.out.println("1 - XP, 2 - Specialty: ");
+                        int subChoice = sc.nextInt();
 
+                        if(subChoice == 1) {
+                            System.out.print("Enter new Experience: ");
+                            coach.setExperience(sc.nextInt());
+                        } else if(subChoice == 2) {
+                            System.out.print("Enter new Specialty: ");
+                            coach.setSpecialty(sc.next());
+                        }
+                        userRepository.save(coach);
+                        System.out.println("Coach updated!");
+                    } else {
+                        System.out.println("That ID does not belong to a coach!");
+                    }
+                }, () -> System.out.println("User Not Found!"));
+            }
+
+            case 2 -> {
+                System.out.println("Type in the Client's UserId:");
+                String userId = sc.next();
+                userRepository.findById(UUID.fromString(userId)).ifPresentOrElse(user -> {
+                    if(user instanceof Client client){
+                        System.out.println("Updating client: " + client.getFirstName());
+                        System.out.println("1 - Assigned Coach, 2 - Password");
+                        int subChoice = sc.nextInt();
+                        sc.nextLine();
+
+                        if(subChoice == 1) {
+                            System.out.print("Enter Coach Email: ");
+                            client.setAssignedCoach(sc.nextLine());
+                        } else if(subChoice == 2) {
+                            System.out.print("Enter New Password: ");
+                            client.setPassword(sc.nextLine());
+                        }
+                        userRepository.save(client);
+                        System.out.println("Client updated!");
+                    }
+                }, () -> System.out.println("User Not Found!"));
+            }
+
+            case 3 -> {
+                // Your Admin logic is already good, just added '->' for consistency!
+                System.out.print("Enter Admin ID to update: ");
+                UUID adminId = UUID.fromString(sc.next());
+                userRepository.findById(adminId).ifPresentOrElse(user -> {
+                    if (user instanceof Admin otherAdmin) {
+                        System.out.println("1. Level | 2. Password | 3. Phone");
+                        int ch = sc.nextInt();
+                        switch (ch) {
+                            case 1 -> { System.out.print("Level: "); otherAdmin.setAdminLevel(sc.nextInt()); }
+                            case 2 -> { System.out.print("Password: "); otherAdmin.setPassword(sc.next()); }
+                            case 3 -> { System.out.print("Phone: "); otherAdmin.setPhoneNumber(sc.next()); }
+                        }
+                        userRepository.save(otherAdmin);
+                    }
+                }, () -> System.out.println("Admin not found."));
             }
         }
+    }
+    public void assignCoach() {
+        System.out.println("--- Assign Coach ---");
+        System.out.println("Enter the userId you want to change the assigned coach to: ");
+        String userId = sc.next();
+        sc.nextLine();
+        userRepository.findById(UUID.fromString(userId)).ifPresentOrElse(user -> {
+            if(user instanceof Client client){
+                System.out.println("Updating client: " + client.getFirstName());
+                System.out.println("Current coach is: " + client.getAssignedCoach());
+                System.out.println("Enter the new coach you want to assing: ");
+                String newCoach = sc.nextLine();
+                client.setAssignedCoach(newCoach);
+                userRepository.save(client);
+                sc.nextLine();
+            }
+        } ,()-> System.out.println("Invalid userId"));
+    }
+    public void deleteUser()
+    {
+        System.out.println("--- Delete User ---");
+        System.out.println("Enter the userId you want to delete: ");
+        String userId = sc.next();
+        System.out.println("Are you sure?: (y/n) ");
+        String answer = sc.next();
+        if(answer.equalsIgnoreCase("y"))
+        {
+            userRepository.deleteById(UUID.fromString(userId));
         }
-        
+        else{System.out.println("Bye.");}
+    }
+
     }
