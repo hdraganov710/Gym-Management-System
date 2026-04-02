@@ -6,12 +6,18 @@ public class InMemoryUserRepository implements UserRepository {
     public Optional<User> findById(UUID id) {return Optional.ofNullable(database.get(id));}
     @Override
     public Optional<User> findByEmail(String email) {
-        return Optional.ofNullable(database.get(email));
+        return database.values().stream()
+                .filter(user -> user.getEmail().equals(email))
+                .findFirst();
     }
     @Override
     public void save(User user) {database.put(user.getUserId(),user);}
     @Override
-    public Optional<User> findByPhoneNumber(String phoneNumber) {return Optional.ofNullable(database.get(phoneNumber));}
+    public Optional<User> findByPhoneNumber(String phoneNumber) {
+        return database.values().stream()
+                .filter(user -> user.getPhoneNumber().equals(phoneNumber))
+                .findFirst();
+    }
     @Override
     public Optional<User> deleteById(UUID id) {
         User userToRemove = database.get(id);

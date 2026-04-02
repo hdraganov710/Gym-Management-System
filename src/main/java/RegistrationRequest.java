@@ -18,7 +18,7 @@ public class RegistrationRequest {
     public String weight;
     public int age;
     public GENDER gender;
-    public String assignedCoach;
+    public UUID assignedCoachId;
     public WorkoutWeek wWeek;
 
     public int adminLevel;
@@ -59,8 +59,8 @@ public class RegistrationRequest {
     public GENDER getGender() { return gender; }
     public void setGender(GENDER gender) { this.gender = gender; }
 
-    public String getAssignedCoach() { return assignedCoach; }
-    public void setAssignedCoach(String assignedCoach) { this.assignedCoach = assignedCoach; }
+    public UUID getAssignedCoachId() { return assignedCoachId; }
+    public void setAssignedCoachId(UUID assignedCoachId) { this.assignedCoachId = assignedCoachId; }
 
     public WorkoutWeek getwWeek() { return wWeek; }
     public void setwWeek(WorkoutWeek wWeek) { this.wWeek = wWeek; }

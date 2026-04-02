@@ -37,12 +37,11 @@ public class CoachMenu {
         }
     }
     public void viewClients(){
-        UUID currCoach = coach.getUserId();
         System.out.println("---Your assigned clients---");
         List<Client> myClients = userRepository.findAll().stream()
                 .filter(user -> user instanceof Client)
                 .map(user -> (Client) user)
-                .filter(client -> currCoach.equals(client.getAssignedCoach()))
+                .filter(client -> coach.getUserId().equals(client.getAssignedCoach()))
                 .toList();
         if (myClients.isEmpty()) {
             System.out.println("No clients assigned to you yet.");
@@ -66,17 +65,20 @@ public class CoachMenu {
     }
     public void handleWorkoutCreation(Client client){
         System.out.println("---Workout creation started---");
+        if (client.getwP() == null) {
+            client.setwP(new WorkoutWeek());
+        }
         System.out.println("Please enter the name of the day you would like to create a workout for: ");
         String dayName = sc.next();
+        sc.nextLine();
         WorkoutDay targetDay = client.getwP().getDays().stream()
                 .filter(day -> day.getDayName().equalsIgnoreCase(dayName))
                 .findFirst()
                 .orElse(null);
-        if(targetDay == null){
+        if(targetDay != null){
             System.out.println("Enter an exercise to add: ");
-            sc.nextLine();
             targetDay.addExercise(sc.nextLine());
-            System.out.println("Exercise added successfully to" + dayName);
+            System.out.println("Exercise added successfully to " + dayName);
         }
         else {
             System.out.println("The day does not exist in the workout plan!");

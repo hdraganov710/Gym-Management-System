@@ -4,14 +4,14 @@ import java.util.List;
 public class WorkoutDay {
     private String dayName;
     private List<String> exercises;
-    public WorkoutDay(String dayName, List<String> Exercises) {
+    public WorkoutDay(String dayName, List<String> exercises) {
         this.dayName = dayName;
-        this.exercises = new ArrayList<>();
+        this.exercises = exercises != null ? new ArrayList<>(exercises) : new ArrayList<>();
     }
     public String getDayName() {return dayName;}
-    public void setDayName(String dayName) {}
+    public void setDayName(String dayName) {this.dayName = dayName;}
     public List<String> getExercises() {return exercises;}
-    public void setExercises(List<String> exercises) {}
+    public void setExercises(List<String> exercises) {this.exercises = exercises;}
     public void addExercise(String exercise) {
         this.exercises.add(exercise);
     }

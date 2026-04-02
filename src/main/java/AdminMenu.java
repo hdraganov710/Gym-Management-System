@@ -2,27 +2,25 @@ import java.util.*;
 
 public class AdminMenu {
     private final Scanner sc;
-    private final Admin admin;
     private final UserRepository userRepository;
 
-    public AdminMenu(Scanner sc, Admin admin, UserRepository userRepository) {
+    public AdminMenu(Scanner sc, UserRepository userRepository) {
         this.sc = sc;
-        this.admin = admin;
         this.userRepository = userRepository;
     }
 
     public void showMenu() {
-        System.out.println("---Admin Menu---");
-        System.out.println("1. View All Users");
-        System.out.println("2. Add New User");
-        System.out.println("3. Change Coach Status");
-        System.out.println("4. Assign Coach");
-        System.out.println("5. Delete User");
-        System.out.println("0. Logout ");
-        System.out.println("Enter your choice");
-        int choice = sc.nextInt();
         boolean backToLogin = false;
         while (!backToLogin) {
+            System.out.println("---Admin Menu---");
+            System.out.println("1. View All Users");
+            System.out.println("2. Add New User");
+            System.out.println("3. Change Coach Status");
+            System.out.println("4. Assign Coach");
+            System.out.println("5. Delete User");
+            System.out.println("0. Logout ");
+            System.out.println("Enter your choice");
+            int choice = sc.nextInt();
             switch (choice) {
                 case 1:
                     viewUsers();
@@ -121,8 +119,8 @@ public class AdminMenu {
                         sc.nextLine();
 
                         if(subChoice == 1) {
-                            System.out.print("Enter Coach Email: ");
-                            client.setAssignedCoach(sc.nextLine());
+                            System.out.print("Enter Coach ID: ");
+                            client.setAssignedCoach(UUID.fromString(sc.nextLine()));
                         } else if(subChoice == 2) {
                             System.out.print("Enter New Password: ");
                             client.setPassword(sc.nextLine());
@@ -134,7 +132,7 @@ public class AdminMenu {
             }
 
             case 3 -> {
-                // Your Admin logic is already good, just added '->' for consistency!
+
                 System.out.print("Enter Admin ID to update: ");
                 UUID adminId = UUID.fromString(sc.next());
                 userRepository.findById(adminId).ifPresentOrElse(user -> {
@@ -161,11 +159,9 @@ public class AdminMenu {
             if(user instanceof Client client){
                 System.out.println("Updating client: " + client.getFirstName());
                 System.out.println("Current coach is: " + client.getAssignedCoach());
-                System.out.println("Enter the new coach you want to assing: ");
-                String newCoach = sc.nextLine();
-                client.setAssignedCoach(newCoach);
+                System.out.println("Enter the new coach ID: ");
+                client.setAssignedCoach(UUID.fromString(sc.nextLine()));
                 userRepository.save(client);
-                sc.nextLine();
             }
         } ,()-> System.out.println("Invalid userId"));
     }

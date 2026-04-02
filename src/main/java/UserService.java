@@ -11,14 +11,13 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("Invalid email or password"));
         if (!user.getPassword().equals(password)) {
-            throw new UserNotFoundException("Invalid email or password");
+            throw new WrongCredentialsException("Invalid email or password");
         }
         return user;
     }
 
     public User register(RegistrationRequest request) {
-        InMemoryUserRepository inMemoryUserRepository = new InMemoryUserRepository();
-        if (userRepository.findByEmail(request.email).isPresent() || userRepository.findByPhoneNumber(request.email).isPresent()) {
+        if (userRepository.findByEmail(request.email).isPresent() || userRepository.findByPhoneNumber(request.phoneNumber).isPresent()) {
             throw new AlreadyTakenUsernameorEmailException("One of the credentials is already taken!");
         }
         User newUser;
@@ -37,7 +36,7 @@ public class UserService {
             case ROLE.CLIENT:
                 newUser = new Client(UUID.randomUUID(), request.email, request.password,
                         ROLE.CLIENT, request.firstName, request.lastName, request.phoneNumber, request.weight,
-                        request.age, request.gender,request.assignedCoach,request.wWeek);
+                        request.age, request.gender,request.assignedCoachId,request.wWeek);
 
                 break;
             default:
@@ -83,4 +82,3 @@ public class UserService {
 
     }
 }
-

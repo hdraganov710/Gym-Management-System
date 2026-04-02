@@ -20,7 +20,7 @@ public class Main {
                         handleRegistration(userService, sc);
                         break;
                         case "2":
-                            handleLogin(userService,sc);
+                            handleLogin(userService, sc, repo);
                             break;
                             case "3":
                                 flag = false;
@@ -29,9 +29,9 @@ public class Main {
 
                 }
             }
-            catch(WrongCredentialsException e)
+            catch(WrongCredentialsException | UserNotFoundException e)
             {
-                System.out.println("Wrong credentials!" + e.getMessage());
+                System.out.println("Error: " + e.getMessage());
             }
         }
 
@@ -47,7 +47,7 @@ public class Main {
         request.firstName = sc.nextLine();
         System.out.print("Last Name: ");
         request.lastName = sc.nextLine();
-        System.out.print("Age: ");
+        System.out.print("Phone Number: ");
         request.phoneNumber = sc.nextLine();
         System.out.print("Role: ");
         while (true) {
@@ -65,6 +65,7 @@ public class Main {
             System.out.println("You are an Administrator!");
             System.out.print("Enter your level: ");
             request.adminLevel = sc.nextInt();
+            sc.nextLine();
             System.out.print("Enter your employeeID: ");
             request.employeeId = UUID.fromString(sc.nextLine());
 
@@ -74,6 +75,7 @@ public class Main {
             System.out.println("You are an Coach!");
             System.out.print("Enter your experience: ");
             request.experience = sc.nextInt();
+            sc.nextLine();
             System.out.print("Enter your specialty: ");
             request.specialty = sc.nextLine();
         }
@@ -82,33 +84,27 @@ public class Main {
             System.out.println("You are an Client!");
             System.out.print("Enter your age: ");
             request.age = sc.nextInt();
-            System.out.print("Enter your gender(1 - Male / 2 - Female: ");
+            System.out.print("Enter your gender(1 - Male / 2 - Female): ");
             request.gender = GENDER.fromInt(sc.nextInt());
+            sc.nextLine();
         }
         userService.register(request);
     }
-    private static void handleLogin(UserService userService, Scanner sc) {
+    private static void handleLogin(UserService userService, Scanner sc, UserRepository repo) {
         System.out.println("--- Login System ---");
-        RegistrationRequest request = new RegistrationRequest();
-        UserRepository repo = new InMemoryUserRepository();
         System.out.print("Email: ");
-        request.email = sc.nextLine();
-        repo.findByEmail(request.email)
-                .ifPresentOrElse(
-                        user -> {
-                            System.out.println("User found with email: " + request.email);
-                            System.out.print("Enter your password: ");
-                            request.password = sc.nextLine();
-                            if(user.getPassword().equals(request.password))
-                            {
-                                System.out.println("Successful login! Welcome, " + user.getFirstName());
-
-                            }
-                            else {System.out.println("Invalid password!");}
-                        },
-                        () -> {System.out.println("Error: No user found with these credentials!");});
-
-        userService.login(request.email, request.password);
+        String email = sc.nextLine();
+        System.out.print("Password: ");
+        String password = sc.nextLine();
+        User user = userService.login(email, password);
+        System.out.println("Successful login! Welcome, " + user.getFirstName());
+        if (user instanceof Admin admin) {
+            new AdminMenu(sc, repo).showMenu();
+        } else if (user instanceof Coach coach) {
+            new CoachMenu(sc, coach, repo).showMenu();
+        } else if (user instanceof Client client) {
+            new ClientMenu(sc, client, repo).showMenu();
+        }
     }
 
 }
