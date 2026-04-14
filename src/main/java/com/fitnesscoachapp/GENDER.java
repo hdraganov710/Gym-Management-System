@@ -1,3 +1,5 @@
+package com.fitnesscoachapp;
+
 public enum GENDER {
     MALE, FEMALE;
 

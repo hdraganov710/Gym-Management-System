@@ -1,3 +1,5 @@
+package com.fitnesscoachapp;
+
 import java.util.ArrayList;
 import java.util.List;
 

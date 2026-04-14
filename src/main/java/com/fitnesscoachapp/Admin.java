@@ -1,3 +1,5 @@
+package com.fitnesscoachapp;
+
 import java.util.*;
 public class Admin extends User {
     private int adminLevel;

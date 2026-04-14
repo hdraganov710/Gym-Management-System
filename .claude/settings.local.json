@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(mvn compile:*)",
+      "Bash(cmd.exe /c \"mvn compile -q 2>&1\")",
+      "Bash(cmd.exe:*)",
+      "Bash(powershell.exe -Command \"Set-Location 'C:\\\\Users\\\\chibe\\\\IdeaProjects\\\\FitnessCoachApp'; mvn compile 2>&1\")",
+      "Bash(powershell.exe:*)",
+      "Bash(JAVA_HOME=\"/c/Users/chibe/AppData/Local/Programs/Eclipse Adoptium/jdk-21.0.10.7-hotspot\" \"/c/Users/chibe/.m2/wrapper/dists/apache-maven-3.9.12-bin/5nmfsn99br87k5d4ajlekdq10k/apache-maven-3.9.12/bin/mvn\" compile)"
     ]
   }
 }

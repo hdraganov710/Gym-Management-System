@@ -1,28 +1,27 @@
+package com.fitnesscoachapp;
+
 import java.util.UUID;
 
 public class RegistrationRequest {
 
+    private String email;
+    private String password;
+    private ROLE role;
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
 
-    public String email;
-    public String password;
-    public ROLE role;
-    public String firstName;
-    public String lastName;
-    public String phoneNumber;
+    private int experience;
+    private String specialty;
 
+    private Double weight;
+    private int age;
+    private GENDER gender;
+    private UUID assignedCoachId;
+    private WorkoutWeek wWeek;
 
-    public int experience;
-    public String specialty;
-
-
-    public String weight;
-    public int age;
-    public GENDER gender;
-    public UUID assignedCoachId;
-    public WorkoutWeek wWeek;
-
-    public int adminLevel;
-    public UUID employeeId;
+    private int adminLevel;
+    private UUID employeeId;
 
     public RegistrationRequest() {}
 
@@ -50,8 +49,8 @@ public class RegistrationRequest {
     public String getSpecialty() { return specialty; }
     public void setSpecialty(String specialty) { this.specialty = specialty; }
 
-    public String getWeight() { return weight; }
-    public void setWeight(String weight) { this.weight = weight; }
+    public Double getWeight() { return weight; }
+    public void setWeight(Double weight) { this.weight = weight; }
 
     public int getAge() { return age; }
     public void setAge(int age) { this.age = age; }

@@ -1,3 +1,5 @@
+package com.fitnesscoachapp;
+
 import java.util.*;
 public abstract class User {
     private final UUID userId;

@@ -1,12 +1,18 @@
+package com.fitnesscoachapp;
+
 import java.util.*;
 
 public class AdminMenu {
     private final Scanner sc;
     private final UserRepository userRepository;
+    private final UserService userService;
+    private final Admin admin;
 
-    public AdminMenu(Scanner sc, UserRepository userRepository) {
+    public AdminMenu(Scanner sc, UserRepository userRepository, UserService userService, Admin admin) {
         this.sc = sc;
         this.userRepository = userRepository;
+        this.userService = userService;
+        this.admin = admin;
     }
 
     public void showMenu() {
@@ -22,42 +28,32 @@ public class AdminMenu {
             System.out.println("Enter your choice");
             int choice = sc.nextInt();
             switch (choice) {
-                case 1:
-                    viewUsers();
-                    break;
-                case 2:
-                    addUser();
-                    break;
-                case 3:
-                    changeStatus();
-                    break;
-                case 4:
-                    assignCoach();
-                    break;
-                case 5:
-                    deleteUser();
-                    break;
-                case 0:
-                    backToLogin = true;
-                    break;
+                case 1 -> viewUsers();
+                case 2 -> addUser();
+                case 3 -> changeStatus();
+                case 4 -> assignCoach();
+                case 5 -> deleteUser();
+                case 0 -> backToLogin = true;
             }
         }
     }
+
     public void viewUsers() {
         userRepository.findAll().forEach(user -> System.out.println(user.toString()));
     }
+
     public void addUser() {
         RegistrationRequest request = new RegistrationRequest();
-        UserService userService = new UserService(userRepository);
         System.out.println("--- User Registration ---");
         System.out.print("Email: "); request.setEmail(sc.next());
         System.out.print("First Name: "); request.setFirstName(sc.next());
         System.out.print("Last Name: "); request.setLastName(sc.next());
+        System.out.print("Phone Number: "); request.setPhoneNumber(sc.next());
         System.out.print("Password: "); request.setPassword(sc.next());
 
         System.out.println("1. Coach | 2. Client | 3. Admin");
         int choice = sc.nextInt();
-        switch(choice) {
+        switch (choice) {
             case 1 -> {
                 request.setRole(ROLE.COACH);
                 System.out.print("Experience (years): ");
@@ -76,27 +72,29 @@ public class AdminMenu {
         }
         userService.register(request);
         System.out.println("User added successfully!");
-        }
+    }
+
     public void changeStatus() {
         System.out.println("--- Change Status ---");
         System.out.println("1. Coach | 2. Client | 3. Admin");
         int choice = sc.nextInt();
         sc.nextLine();
 
-        switch(choice) {
+        switch (choice) {
             case 1 -> {
                 System.out.println("Type in the Coach's UserId:");
                 String userId = sc.next();
+                sc.nextLine();
+                try { UUID.fromString(userId); } catch (IllegalArgumentException e) { System.out.println("Invalid ID format."); break; }
                 userRepository.findById(UUID.fromString(userId)).ifPresentOrElse(user -> {
-                    if(user instanceof Coach coach){
+                    if (user instanceof Coach coach) {
                         System.out.println("Updating coach: " + coach.getFirstName());
                         System.out.println("1 - XP, 2 - Specialty: ");
                         int subChoice = sc.nextInt();
-
-                        if(subChoice == 1) {
+                        if (subChoice == 1) {
                             System.out.print("Enter new Experience: ");
                             coach.setExperience(sc.nextInt());
-                        } else if(subChoice == 2) {
+                        } else if (subChoice == 2) {
                             System.out.print("Enter new Specialty: ");
                             coach.setSpecialty(sc.next());
                         }
@@ -111,30 +109,30 @@ public class AdminMenu {
             case 2 -> {
                 System.out.println("Type in the Client's UserId:");
                 String userId = sc.next();
-                userRepository.findById(UUID.fromString(userId)).ifPresentOrElse(user -> {
-                    if(user instanceof Client client){
-                        System.out.println("Updating client: " + client.getFirstName());
-                        System.out.println("1 - Assigned Coach, 2 - Password");
-                        int subChoice = sc.nextInt();
-                        sc.nextLine();
-
-                        if(subChoice == 1) {
-                            System.out.print("Enter Coach ID: ");
-                            client.setAssignedCoach(UUID.fromString(sc.nextLine()));
-                        } else if(subChoice == 2) {
+                sc.nextLine();
+                try {
+                    userRepository.findById(UUID.fromString(userId)).ifPresentOrElse(user -> {
+                        if (user instanceof Client client) {
+                            System.out.println("Updating client: " + client.getFirstName());
                             System.out.print("Enter New Password: ");
                             client.setPassword(sc.nextLine());
+                            userRepository.save(client);
+                            System.out.println("Client updated!");
+                        } else {
+                            System.out.println("That ID does not belong to a client!");
                         }
-                        userRepository.save(client);
-                        System.out.println("Client updated!");
-                    }
-                }, () -> System.out.println("User Not Found!"));
+                    }, () -> System.out.println("User Not Found!"));
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Invalid ID format.");
+                }
             }
 
             case 3 -> {
-
                 System.out.print("Enter Admin ID to update: ");
-                UUID adminId = UUID.fromString(sc.next());
+                String adminIdStr = sc.next();
+                sc.nextLine();
+                UUID adminId;
+                try { adminId = UUID.fromString(adminIdStr); } catch (IllegalArgumentException e) { System.out.println("Invalid ID format."); break; }
                 userRepository.findById(adminId).ifPresentOrElse(user -> {
                     if (user instanceof Admin otherAdmin) {
                         System.out.println("1. Level | 2. Password | 3. Phone");
@@ -150,33 +148,46 @@ public class AdminMenu {
             }
         }
     }
+
     public void assignCoach() {
         System.out.println("--- Assign Coach ---");
         System.out.println("Enter the userId you want to change the assigned coach to: ");
         String userId = sc.next();
         sc.nextLine();
-        userRepository.findById(UUID.fromString(userId)).ifPresentOrElse(user -> {
-            if(user instanceof Client client){
+        UUID clientUuid;
+        try { clientUuid = UUID.fromString(userId); } catch (IllegalArgumentException e) { System.out.println("Invalid ID format."); return; }
+        userRepository.findById(clientUuid).ifPresentOrElse(user -> {
+            if (user instanceof Client client) {
                 System.out.println("Updating client: " + client.getFirstName());
                 System.out.println("Current coach is: " + client.getAssignedCoach());
                 System.out.println("Enter the new coach ID: ");
-                client.setAssignedCoach(UUID.fromString(sc.nextLine()));
-                userRepository.save(client);
+                try {
+                    client.setAssignedCoach(UUID.fromString(sc.nextLine()));
+                    userRepository.save(client);
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Invalid coach ID format.");
+                }
             }
-        } ,()-> System.out.println("Invalid userId"));
+        }, () -> System.out.println("Invalid userId"));
     }
-    public void deleteUser()
-    {
+
+    public void deleteUser() {
         System.out.println("--- Delete User ---");
         System.out.println("Enter the userId you want to delete: ");
         String userId = sc.next();
         System.out.println("Are you sure?: (y/n) ");
         String answer = sc.next();
-        if(answer.equalsIgnoreCase("y"))
-        {
-            userRepository.deleteById(UUID.fromString(userId));
+        if (answer.equalsIgnoreCase("y")) {
+            try {
+                userService.deleteUser(admin.getUserId(), UUID.fromString(userId));
+                System.out.println("User deleted.");
+            } catch (UserNotFoundException | UnauthorizedException e) {
+                System.out.println("Error: " + e.getMessage());
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid ID format.");
+            }
+        } else {
+            System.out.println("Bye.");
         }
-        else{System.out.println("Bye.");}
     }
-
-    }
+}

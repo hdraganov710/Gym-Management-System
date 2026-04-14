@@ -1,3 +1,5 @@
+package com.fitnesscoachapp;
+
 import java.util.UUID;
 
 public class Coach extends User {

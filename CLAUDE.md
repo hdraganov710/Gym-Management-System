@@ -26,7 +26,7 @@ This is a CLI-only gym management system with **no database** — all data lives
 `Main` → `UserService` → `UserRepository` (interface) → `InMemoryUserRepository`
 
 1. `Main.java` handles the top-level loop (Register / Login / Exit), collects input into a `RegistrationRequest`, and delegates to `UserService`.
-2. After login, `Main` routes to `AdminMenu` or `CoachMenu` (Clients have no menu yet), passing them the shared `UserRepository` instance.
+2. After login, `Main` routes to `AdminMenu`, `CoachMenu`, or `ClientMenu`, passing the shared `UserService` (and `UserRepository` where needed).
 3. `UserService` contains all business logic: `login`, `register`, `deleteUser`, `getAllUsersByRole`, `updateProfile`.
 4. `InMemoryUserRepository` is the only implementation of `UserRepository`. It stores users by `UUID` key; `findByEmail` and `findByPhoneNumber` iterate over values.
 
@@ -34,7 +34,7 @@ This is a CLI-only gym management system with **no database** — all data lives
 
 - `User` (abstract) ← `Admin`, `Coach`, `Client`
 - `Client` holds a `WorkoutWeek` (list of `WorkoutDay`s, each with a list of exercise strings).
-- `Client.assignedCoach` is stored as the **coach's email** string (set by admins via `AdminMenu`).
+- `Client.assignedCoach` is stored as the **coach's UUID** (set by admins via `AdminMenu`).
 - `RegistrationRequest` is a flat DTO used for both registration and profile updates — fields are role-conditional (e.g., `adminLevel` only matters for `ROLE.ADMIN`).
 
 ### Role-specific menus
@@ -42,10 +42,10 @@ This is a CLI-only gym management system with **no database** — all data lives
 | Role  | Menu class   | Key capabilities |
 |-------|-------------|-----------------|
 | Admin | `AdminMenu` | View/add/delete users, assign coach to client, change status |
-| Coach | `CoachMenu` | View assigned clients, add exercises to existing workout days |
-| Client | _(none yet)_ | — |
+| Coach | `CoachMenu` | View assigned clients, add exercises, create new workout days |
+| Client | `ClientMenu` | View profile, view workout plan, update password/weight |
 
-`CoachMenu.viewClients()` filters by `coach.getEmail().equals(client.getAssignedCoach())`.
+`CoachMenu.viewClients()` filters by `coach.getUserId().equals(client.getAssignedCoach())`.
 
 ### Source layout
 

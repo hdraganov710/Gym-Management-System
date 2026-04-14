@@ -1,8 +1,21 @@
+package com.fitnesscoachapp;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 import java.util.Scanner;
 import java.util.UUID;
 
-public class Main {
+@SpringBootApplication
+public class Main implements CommandLineRunner {
+
     public static void main(String[] args) {
+        SpringApplication.run(Main.class, args);
+    }
+
+    @Override
+    public void run(String... args) {
         Scanner sc = new Scanner(System.in);
         UserRepository repo = new InMemoryUserRepository();
         UserService userService = new UserService(repo);
@@ -16,80 +29,64 @@ public class Main {
             String choice = sc.nextLine();
             try {
                 switch (choice) {
-                    case "1":
-                        handleRegistration(userService, sc);
-                        break;
-                        case "2":
-                            handleLogin(userService, sc, repo);
-                            break;
-                            case "3":
-                                flag = false;
-                                break;
-
-
+                    case "1" -> handleRegistration(userService, sc);
+                    case "2" -> handleLogin(userService, sc, repo);
+                    case "3" -> flag = false;
                 }
-            }
-            catch(WrongCredentialsException | UserNotFoundException e)
-            {
+            } catch (WrongCredentialsException | UserNotFoundException e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }
-
     }
+
     private static void handleRegistration(UserService userService, Scanner sc) {
-        System.out.print("---New user Registration---");
+        System.out.println("---New user Registration---");
         RegistrationRequest request = new RegistrationRequest();
         System.out.print("Email: ");
-        request.email = sc.nextLine();
+        request.setEmail(sc.nextLine());
         System.out.print("Password: ");
-        request.password = sc.nextLine();
+        request.setPassword(sc.nextLine());
         System.out.print("First Name: ");
-        request.firstName = sc.nextLine();
+        request.setFirstName(sc.nextLine());
         System.out.print("Last Name: ");
-        request.lastName = sc.nextLine();
+        request.setLastName(sc.nextLine());
         System.out.print("Phone Number: ");
-        request.phoneNumber = sc.nextLine();
+        request.setPhoneNumber(sc.nextLine());
         System.out.print("Role: ");
         while (true) {
             try {
                 String role = sc.nextLine();
-                request.role = ROLE.valueOf(role.trim().toUpperCase());
+                request.setRole(ROLE.valueOf(role.trim().toUpperCase()));
                 break;
-                }
-            catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) {
                 System.out.println("Invalid Role!");
             }
         }
-        if(ROLE.ADMIN == request.role)
-        {
+        if (ROLE.ADMIN == request.getRole()) {
             System.out.println("You are an Administrator!");
             System.out.print("Enter your level: ");
-            request.adminLevel = sc.nextInt();
+            request.setAdminLevel(sc.nextInt());
             sc.nextLine();
             System.out.print("Enter your employeeID: ");
-            request.employeeId = UUID.fromString(sc.nextLine());
-
-        }
-        else if(ROLE.COACH == request.role)
-        {
-            System.out.println("You are an Coach!");
+            request.setEmployeeId(UUID.fromString(sc.nextLine()));
+        } else if (ROLE.COACH == request.getRole()) {
+            System.out.println("You are a Coach!");
             System.out.print("Enter your experience: ");
-            request.experience = sc.nextInt();
+            request.setExperience(sc.nextInt());
             sc.nextLine();
             System.out.print("Enter your specialty: ");
-            request.specialty = sc.nextLine();
-        }
-        else if(ROLE.CLIENT == request.role)
-        {
-            System.out.println("You are an Client!");
+            request.setSpecialty(sc.nextLine());
+        } else if (ROLE.CLIENT == request.getRole()) {
+            System.out.println("You are a Client!");
             System.out.print("Enter your age: ");
-            request.age = sc.nextInt();
-            System.out.print("Enter your gender(1 - Male / 2 - Female): ");
-            request.gender = GENDER.fromInt(sc.nextInt());
+            request.setAge(sc.nextInt());
+            System.out.print("Enter your gender (1 - Male / 2 - Female): ");
+            request.setGender(GENDER.fromInt(sc.nextInt()));
             sc.nextLine();
         }
         userService.register(request);
     }
+
     private static void handleLogin(UserService userService, Scanner sc, UserRepository repo) {
         System.out.println("--- Login System ---");
         System.out.print("Email: ");
@@ -99,12 +96,11 @@ public class Main {
         User user = userService.login(email, password);
         System.out.println("Successful login! Welcome, " + user.getFirstName());
         if (user instanceof Admin admin) {
-            new AdminMenu(sc, repo).showMenu();
+            new AdminMenu(sc, repo, userService, admin).showMenu();
         } else if (user instanceof Coach coach) {
             new CoachMenu(sc, coach, repo).showMenu();
         } else if (user instanceof Client client) {
-            new ClientMenu(sc, client, repo).showMenu();
+            new ClientMenu(sc, client, userService, repo).showMenu();
         }
     }
-
 }
